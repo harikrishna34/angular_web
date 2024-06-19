@@ -1,0 +1,230 @@
+<div class="bodycontent">
+    <div class="row col-md-12" style="margin-bottom: 40px;">
+        <div class="card col-md-4"
+            style="height: 100px; width: 200px; margin-left: 30px; cursor: pointer; font-size: larger;text-align: center;"
+            (click)="naviagateToActiveCustomers(viewCustomersActive)">
+            <div class="card-title fs-6" style="color: purple;">
+                Active Customers
+            </div>
+            <div style="margin-top: 50px; text-align: center; color: #FABA75;" class="fs-2 mt-3">
+                {{countsData?.activeCustomers}}</div>
+        </div>
+        <div class="card col-md-4"
+            style="height: 100px; width: 200px; margin-left: 30px; cursor: pointer; font-size: larger; text-align: center;"
+            (click)="naviagateToEmergencyPlanTable(viewCustomersActive)">
+            <div class="card-title fs-6" style="color: purple;">
+                Emergency Plan
+            </div>
+            <div style="margin-top: 50px; text-align: center; color: #FABA75;" class="fs-2 mt-3">
+                {{countsData?.pendingMemberOnboardings}}</div>
+        </div>
+        <div class="card col-md-4"
+            style="height: 100px; width: 200px; margin-left: 30px; cursor: pointer; font-size: larger; text-align: center;"
+            (click)="naviagateToPendingCallsTable(viewCustomersActive)">
+            <div class="card-title fs-6" style="color: purple;">
+                Touch Points
+            </div>
+            <div style="margin-top: 50px; text-align: center; color: #FABA75;" class="fs-2 mt-3">
+                {{countsData?.pendingCalls}}</div>
+        </div>
+        <div class="card col-md-4"
+            style="height: 100px; width: 200px; margin-left: 30px; cursor: pointer; font-size: larger; text-align: center;"
+            (click)="naviagateToPendingRequestsTable(viewCustomersActive)">
+            <div class="card-title fs-6" style="color: purple;">
+                Pending Requets
+            </div>
+            <div style="margin-top: 50px; text-align: center; color: #FABA75;" class="fs-2 mt-3">
+                {{countsData?.pendingRequests}}
+            </div>
+        </div>
+        <div class="tab-content" id="nav-tabContent" style="margin-top: 40px;">
+            <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+                <div class="card panel-default">
+                    <div class="card-body">
+
+                        <div class="container">
+                            <div *ngIf="activeCustomersVisible">
+                                <div class="col-md-2 mt-3" style="margin-left: 90%;"><button type="button"
+                                        class="anvayaabutton-secondary" (click)=" getActiveCustomer()">Download</button>
+                                </div>
+                                <h3 class="reuestHeading"> Active Customers</h3>
+                                <table class="table table-striped text-start card-body">
+                                    <thead class="tablehead">
+                                        <tr>
+                                            <th>Customer ID</th>
+                                            <th>Customer Name</th>
+                                            <th>Plan</th>
+                                            <th>City</th>
+                                            <th>Plan Start Date</th>
+                                            <th>Plan End Date</th>
+
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <!-- viewCustomersActive?.perPage , viewCustomersActive?.totalRecords -->
+                                    <tbody
+                                        *ngFor="let customer of viewCustomersActive | paginate: { itemsPerPage: paginationdata?.perPage, currentPage: paginationdata?.currentPage, totalItems: paginationdata?.totalRecords }">
+                                        <tr>
+                                            <td>{{customer?.CustRecID}}</td>
+                                            <td>{{customer?.customerDetails?.Name |replaceUnderscore| titlecase}}</td>
+                                            <td>{{customer?.AliasName |replaceUnderscore| titlecase}}</td>
+                                            <td>{{customer?.ServiceAreaName |replaceUnderscore| titlecase}}</td>
+                                            <td>{{customer?.PackageCreatedDate*1000 | date: 'dd-MMM-yyyy'}}</td>
+                                            <td>{{customer?.PackageExpiryDate*1000 | date: 'dd-MMM-yyyy'}}</td>
+                                            <td>{{customer?.Status}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="d-flex justify-content-center">
+                                    <pagination-controls class="pagination" previousLabel="Prev" nextLabel="Next"
+                                        (pageChange)="onActiveCustomerDataChange($event)">
+                                    </pagination-controls>
+                                </div>
+
+                                <!-- <mat-paginator [length]="100" [pageSize]="10" [pageSizeOptions]="[5, 10, 25, 100]">
+                                </mat-paginator> -->
+                            </div>
+                            <div *ngIf="emergencyPlanVisible">
+                                <div class="col-md-2 mt-3" style="margin-left: 90%;"><button type="button"
+                                        class="anvayaabutton-secondary" (click)=" getPendingMemberOnBoarding()">Download</button>
+                                </div>
+                                <h3 class="reuestHeading">Emergency Plan</h3>
+                                <table class="table table-striped text-start card-body mt-6">
+                                    <thead class="tablehead">
+                                        <tr>
+                                            <th>Customer ID</th>
+                                            <th>Customer Name</th>
+                                            <th>Agent Name </th>
+                                            <th>Plan</th>
+                                            <th>City</th>
+                                            <th>Pending Since(Days)</th>
+                                            <th>Status </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody
+                                        *ngFor="let viewEmegenyPlan of viewEmegenyPlan | paginate: { itemsPerPage: paginationdata?.perPage, currentPage: paginationdata?.currentPage, totalItems: paginationdata?.totalRecords }">
+                                        <tr>
+                                            <td>{{viewEmegenyPlan?.custRecID}}</td>
+                                            <td>{{viewEmegenyPlan?.customerName |replaceUnderscore| titlecase}}</td>
+                                            <!-- <td>{{viewEmegenyPlan?.beneficiaryName}}</td> -->
+                                            <td>{{viewEmegenyPlan?.agentName |replaceUnderscore| titlecase}}</td>
+                                            <td>{{viewEmegenyPlan?.plan |replaceUnderscore| titlecase}}</td>
+                                            <td>{{viewEmegenyPlan?.city |replaceUnderscore| titlecase}}</td>
+                                            <td>{{viewEmegenyPlan?.pendingSinceInDays}}</td>
+                                            <td>{{viewEmegenyPlan?.status}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="d-flex justify-content-center">
+
+                                    <pagination-controls
+                                        (pageChange)="onEmergencyPlanPageChange($event)"></pagination-controls>
+
+                                </div>
+                            </div>
+                            <div *ngIf="pendingRequestVisible">
+
+                                <div class="col-md-2 mt-3" style="margin-left: 90%;"><button type="button"
+                                        class="anvayaabutton-secondary" (click)=" getPendingRequest()">Download</button>
+                                </div>
+                                <h3 class="reuestHeading">Pending Requests</h3>
+
+                                <table class="table table-striped text-start card-body mt-6">
+                                    <thead class="tablehead">
+                                        <tr>
+                                            <th>Request ID</th>
+                                            <th>Customer Name</th>
+                                            <!-- <th (click)="sortData('CreatedPersonName')">Requested Name </th> -->
+                                            <th>Service Type</th>
+                                            <th>Created Date </th>
+                                            <th>Updated Date </th>
+                                            <th>Area</th>
+                                            <th>Status </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody
+                                        *ngFor="let data of viewPendingRequests | paginate: { itemsPerPage: paginationdata?.perPage, currentPage: paginationdata?.currentPage, totalItems: paginationdata?.totalRecords }">
+                                        <tr>
+                                            <td>{{data?.RequestID}}
+                                                <div>
+                                                    {{data?.SubSubCategoryName |replaceUnderscore| titlecase}}
+                                                </div>
+                                            </td>
+                                            <td>{{data?.Name |replaceUnderscore| titlecase}}</td>
+                                            <td>{{data?.ServiceType |replaceUnderscore| titlecase}}</td>
+                                            <td>{{data?.CreatedDate*1000 | date: 'dd-MMM-yyyy'}}</td>
+                                            <td>{{data?.UpdatedDate*1000 | date: 'dd-MMM-yyyy'}}</td>
+                                            <td>{{data?.ServiceAreaName}}</td>
+                                            <td style="width: 20px;">{{data?.Status}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="d-flex justify-content-center">
+                                    <pagination-controls
+                                        (pageChange)="onPendingRequestsPageChange($event)"></pagination-controls>
+                                </div>
+                            </div>
+                            <div *ngIf="touchPointcallsVisible">
+                                <div class="col-md-2 mt-3" style="margin-left: 80%;"><button type="button"
+                                        class="anvayaabutton-secondary"
+                                        (click)=" getTouchPointCalls()">Download</button>
+                                </div>
+                                <h3 class="reuestHeading"> Touch Point Calls</h3>
+                                <table class="table table-striped text-start card-body mt-6">
+                                    <thead class="tablehead">
+                                        <tr>
+                                            <th>Customer ID</th>
+                                            <th>Customer Name</th>
+                                            <!-- <th>Beneficiary Name</th> -->
+                                            <!-- <th (click)="sortData('CreatedPersonName')">Requested Name </th> -->
+                                            <th>Agent Name </th>
+                                            <th>City</th>
+                                            <th>Pending Since(Days)</th>
+                                            <th>Plan</th>
+                                            <th>Status </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody
+                                        *ngFor="let data of viewPendingCalls | paginate: { itemsPerPage: paginationdata?.perPage, currentPage: paginationdata?.currentPage, totalItems: paginationdata?.totalRecords }">
+                                        <tr>
+                                            <td>{{data?.custRecID}}</td>
+                                            <td>{{data?.customerName |replaceUnderscore| titlecase}}</td>
+                                            <!-- <td>{{data?.beneficiaryName |replaceUnderscore| titlecase}}</td> -->
+                                            <td>{{data?.agentName |replaceUnderscore| titlecase}}</td>
+                                            <td>{{data?.city |replaceUnderscore| titlecase}}</td>
+                                            <td>{{data?.pendingSinceInDays}}</td>
+                                            <td>{{data?.plan |replaceUnderscore| titlecase}}</td>
+                                            <td>{{data?.status |replaceUnderscore| titlecase}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="d-flex justify-content-center">
+                                    <pagination-controls (pageChange)="onPendingCallsPageChange($event)"
+                                        previousLabel="Prev" nextLabel="Next"></pagination-controls>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br>
+
+                    </div>
+                    <div *ngIf="NodataTable" style="text-align: center;font-size: x-large;">No Data Found !</div>
+                </div>
+            </div>
+            <div class="tab-pane fade show" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+                <div class="card panel-default">
+                    <div class="card-body">
+                        <table class="">
+
+                        </table>
+                    </div>
+                    <div *ngIf="NodataTable" style="text-align: center;font-size: x-large;">No Data Found !</div>
+                </div>
+            </div>
+
+        </div>
+
+
+
+    </div>
+    <ngx-spinner type="ball-scale-multiple">loading...</ngx-spinner>
